@@ -1,0 +1,46 @@
+<head>
+  <!-- Set character encoding for the document -->
+  <meta charset="utf-8">
+  <!-- Instruct Internet Explorer to use its latest rendering engine -->
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <!-- Viewport for responsive web design -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Document Title -->
+  <title> Point Graph - Perceptual Phenomenon </title>
+  <!-- Meta Description -->
+  <meta name="description" content="My D3 Playground">
+  <!-- Standard favicon -->
+  <link rel="icon" type="image/x-icon" href="https://example.com/favicon.ico">
+  <!-- Recommended favicon format -->
+  <link rel="icon" type="image/png" href="https://example.com/favicon.png">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700"
+  rel="stylesheet">
+  <!--<script type="text/javascript" src="../d3.js"></script>-->
+  <link rel="stylesheet" type="text/css" href="styles.css">
+
+
+</head>
+
+<body>
+
+  <div id="viz">
+    <div id="title-bar">
+  <h1> Data Analysis Nanodegree </h1>
+  <h3> Project - Test a Perceptual Phenomenon </h3>
+  </div>
+
+  <p class="desc"> Using this 'points graph' we can see the different values in each task per student. It's clear that every student has better results with the congruent task than with the incongruent one. Pairing that knowledge with the information given by the 'bee swarm' plot, it's safe to say that not only the distribution of each category is biased towards different directions, but that on an individual level this behavior persists. </p>
+  <svg class="viz" width="960" height="350">></svg>
+  <div id="tooltip" class="hidden">
+    <p><strong>Important Label Heading</strong></p>
+    <p><span id="value">100</span></p>
+  </div>
+
+  </div>
+</body>
+
+<footer>
+<!--  <script src="../d3.js"></script>-->
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script type="text/javascript" src="main.js"></script>
+</footer>
