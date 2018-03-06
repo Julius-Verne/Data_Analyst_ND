@@ -2,6 +2,7 @@ fb_data <- read.csv("data/pseudo_facebook.tsv", sep = "\t")
 
 library(ggplot2)
 library(gridExtra)
+library(dplyr)
 
 summary(fb_data)
 
@@ -98,3 +99,22 @@ checked <- sum(fb_data$mobile_checkin == TRUE)
 
 total <- checked/amount * 100
 total
+
+
+ggplot(aes(x = age, y = friend_count),
+       data = subset(fb_data, !is.na(gender))) +
+  geom_line(aes(color = gender), stat = "summary", fun.y = median) +
+  xlim(13,70)
+
+pf.fc_by_age_gender <- group_by(subset(fb_data, !is.na(gender)), gender, age)
+
+pf.fc_by_age_gender <- summarise(pf.fc_by_age_gender,
+                                 mean_friend_count = mean(friend_count),
+                                 median_friend_count = median(as.numeric(friend_count)),
+                                 n = n())
+
+pf.fc_by_age_gender
+
+ggplot(aes(x = age, y = median_friend_count),
+       data = pf.fc_by_age_gender) + 
+  geom_line(aes(color=gender))
