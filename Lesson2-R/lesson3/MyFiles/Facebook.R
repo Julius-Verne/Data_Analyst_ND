@@ -118,3 +118,12 @@ pf.fc_by_age_gender
 ggplot(aes(x = age, y = median_friend_count),
        data = pf.fc_by_age_gender) + 
   geom_line(aes(color=gender))
+
+library(reshape2)
+
+pf.fc_by_age_gender.wide <- dcast(pf.fc_by_age_gender,
+                                  age gender,
+                                  value.var = 'median_friend_count')
+  
+head(pf.fc_by_age_gender.wide)
+?facet_wrap()
