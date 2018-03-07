@@ -36,4 +36,27 @@ order_clarity <- group_by(diamonds, clarity)
 dm_order_clarity <- summarise(order_clarity, 
                             price_mean = mean(price),
                             price_median = median(as.numeric(price)),
+                            price_max = max(price),
+                            price_min = min(price),
                             n = n())
+
+summary(dm_order_clarity)
+
+
+###################################
+
+
+diamonds_by_clarity <- group_by(diamonds, clarity)
+diamonds_mp_by_clarity <- summarise(diamonds_by_clarity, mean_price = mean(price))
+
+diamonds_by_color <- group_by(diamonds, color)
+diamonds_mp_by_color <- summarise(diamonds_by_color, mean_price = mean(price))
+
+
+ggplot(aes(x = diamonds_by_clarity, y = mean_price),
+       data = diamonds_mp_by_clarity) +
+  geom_bar(stat = 'identity')
+
+summary(diamonds_mp_by_clarity)
+
+str(diamonds_mp_by_clarity)

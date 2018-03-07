@@ -88,3 +88,6 @@ head(pf.fc_by_month)
 ggplot(aes(x = age_in_months, y = friend_count_mean),
        data = subset(pf.fc_by_month, age_in_months <= 71)) + 
   geom_line()
+
+######################################
+
