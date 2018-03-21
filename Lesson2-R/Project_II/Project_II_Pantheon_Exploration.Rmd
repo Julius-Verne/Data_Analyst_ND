@@ -1,0 +1,1031 @@
+> # **Popular Historic Figures Exploration**  \
+> by Julian Hernández
+
+> ## Database Information
+
+> Pantheon  is a project developed by the Macro Connections group at 
+The MIT Media Lab. It is a way to celebrate our acomplishments as a species by 
+documentating our global heritage. You can find more about this dataset and 
+project on [Kaggle](https://www.kaggle.com/mit/pantheon-project) or 
+[Pantheon's Official Site](http://pantheon.media.mit.edu/methods)
+
+> This dataset gathers information on the 11,341 biographies that have
+presence in more than 25 languages in the Wikipedia (as of May 2013).
+This dataset is not restricted to any cultural domain or time period, 
+including all biographies that are present in more than 
+25 different language editions of Wikipedia. 
+
+> The dataset has 17 variables from which I choose 12 to analyze. \
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# Load all of the packages that you end up using in your analysis in this code
+# chunk.
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk. This
+# prevents the code from displaying in the knitted HTML output. You should set
+# echo=FALSE for all code chunks in your file, unless it makes sense for your
+# report to show the code that generated a particular plot.
+
+# The other parameters for "message" and "warning" should also be set to FALSE
+# for other code chunks once you have verified that each plot comes out as you
+# want it to. This will clean up the flow of your report.
+
+library(ggplot2)
+library(gridExtra)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Load_the_Data}
+# Load the Data
+base <-read.csv("data/database.csv", stringsAsFactors=FALSE)
+db <- subset(base,
+             select = c(full_name, birth_year, sex, country, continent, 
+                        occupation, industry, domain, article_languages,
+                        page_views,average_views,
+                        historical_popularity_index))
+
+
+db$birth_year <- as.numeric(as.character(db$birth_year))
+db$sex <- as.factor(db$sex)
+db$country <- as.factor(db$country)
+db$continent <- as.factor(db$continent)
+db$occupation <- as.factor(db$occupation)
+db$industry <- as.factor(db$industry)
+db$domain <- as.factor(db$domain)
+db <-subset(db, !is.na(db$birth_year))
+db$antiquity <- 2013 - db$birth_year
+db$hpi <- db$historical_popularity_index
+
+str(db)
+```
+
+> ## Variable Description
+
+> **full_name**: Name of the historical figure \
+> **birth_year**: Birth Year of the historical figure in the Gregorian Calendar\
+> **sex**: Biological Sex of the historical figure (Male / Female) \
+> **country**: Country or modern day equivalent where the historical figure 
+was born. \
+> **continent**: Continent where the historical figure was born. \
+> **occupation**: Profession the historical figure had. \
+> **industry**: Industry of the historical figure. \
+> **Domain**: Domain of Knowledge where the historical figure excelled. \
+> **article_languages**: Number of Languages the historical figure biography is
+present in Wikipedia. \
+> **page_views**: Total number of pageviews in all languages. \
+> **average_views**: Total Number of pageviews divided by number of languages the
+biography is in.\
+> **HPI** or **historical_popularity_index**: A more complex way to measure the 
+historical impact by using the number of languagues, page views, age of the
+character, and the variation in pageviews per language.
+
+
+```{r}
+summary(db)
+```
+
+# Preliminar Questions
+> Is there any guiding principle for historical popularity, maybe location,
+profession or time period? Which professions are more historically memorable or
+significant? Is there any difference in the behavior of men and woman in the data? 
+How does location influences historical popularity? Is there any difference in the 
+occupations that are remembered per location?
+
+# Univariate Plots Section
+
+> ## Year of Birth
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots}
+
+p1 <- ggplot(db, aes(x=birth_year))+
+  geom_histogram(binwidth = 50)+ 
+  scale_x_continuous(breaks = seq(-5000,2000,500))+
+  ggtitle("Year of Birth", subtitle = "Complete dataset")+ 
+  labs(colour = "Cylinders", x = "Years", y = "# of People")+
+  theme_minimal()+ 
+  theme_update(plot.title = element_text(size = rel(2)))
+
+
+p2 <- ggplot(db, aes(x=birth_year))+
+  geom_histogram(binwidth = 10)+ 
+  ggtitle("Year of Birth", subtitle = "5% Quantile and Up")+ 
+  labs( x = "Years", y = "# of People") +
+  xlim( 
+    0,
+    2010)
+
+grid.arrange(p1,p2)
+
+```
+
+> **Year of Birth**: Most globally notable figures were born on recent times.
+Nevertheless there is huge variability, dates range from -3500 BC to 2005 AC.
+
+> The data follows an upward trend towards recent times but it has a dip on the
+most recent years (1995 - 2010). Which could be due to the fact that people born on those years
+are fairly young and still need more time to develop their careers and skills. It 
+could be also due to the specialization of skills needed to work on contemporary times, which
+makes teams more necessary and teams do not appear on the dataset.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE }
+
+ggplot(db, aes(x=birth_year))+
+  geom_histogram(binwidth = 5)+ 
+  scale_x_continuous(breaks = seq(1800,2010,25)) +
+  ggtitle("Year of Birth", subtitle = "Births from 1800 to 2005")+ 
+  labs(colour = "Cylinders", x = "Years", y = "# of People")+
+  theme_minimal()+ 
+  theme_update(plot.title = element_text(size = rel(2))) + 
+  xlim(1800, 2010)
+
+```
+
+> ## Sex: 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, sex}
+
+ggplot(db, aes(x= sex))+
+  geom_bar(aes(fill = sex))+ 
+  ggtitle("# of People By Sex", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "")+
+  theme_minimal()+ 
+  theme_update(plot.title = element_text(size = rel(2)))
+
+```
+
+> There is a huge difference in the amount of men and women in the dataset. In 
+this exploration it wont be possible to explain this imbalance, due to the fact 
+that we are not looking at the complete dataset of biographies in wikipedia but 
+a subset, the ones translated to more than 25 
+languages.  
+
+> ## Location
+
+```{r fig.height=25, echo=FALSE, message=FALSE, warning=FALSE }
+
+
+
+
+
+ggplot(subset(db, continent != ""), 
+       aes(x=reorder(country , country,
+                     function(x)-length(x))))+
+  geom_bar()+ 
+  ggtitle("# of People By Country", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "Country")+
+  theme_minimal()+ 
+  theme_update(plot.title = element_text(size = rel(2)))+
+  coord_flip()
+
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, region }
+
+ggplot(subset(db, continent != ""), aes( x=reorder(continent , continent,
+                     function(x)-length(x))))+
+  geom_bar()+ 
+  ggtitle("# of People By Continent", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "Countries")+
+  theme_minimal()+ 
+  theme_update(plot.title = element_text(size = rel(2)))
+
+```
+
+> In the past graphs we can see the distribution of great people among 
+continents and countries.
+
+> In terms of continents, most notable people come from Europe, followed by 
+North America and then Asia. In terms of countries, the United States is 
+followed by several european countries ( France, Germany, the UK and Italy). 
+
+
+>This reflects Wikipedia bias, a bias the authors of the dataset identify as an 
+issue. Wikipedia is more popular in Western countries where European history and
+figures are studied and remembered. Continents with 
+history that spans millenia and that have huge populations such as Asia or Africa are 
+lacking in representation.
+
+> ## Industry & Domain
+
+```{r fig.height=15, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+ggplot(subset(db, continent != ""), 
+       aes(x=reorder(occupation , occupation,
+                     function(x)-length(x))))+
+  geom_bar()+ 
+  ggtitle("# of People By Occupation", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "Occupation")+
+  theme_minimal()+ 
+  theme_update(plot.title = element_text(size = rel(2)))+
+  coord_flip()
+
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE }
+
+ggplot(db, aes(x=reorder(industry , industry,
+                     function(x)-length(x))))+
+  geom_bar()+ 
+  ggtitle("# of People By Industry", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "Industry")+
+  theme_minimal()+ 
+  theme_update(plot.title = element_text(size = rel(2)))+
+  theme(axis.text.x=element_text(angle = -90, hjust = 0, vjust = 0.3))
+
+
+```
+```{r echo=FALSE, message=FALSE, warning=FALSE }
+
+ggplot(db, aes(x=reorder(domain , domain,
+                     function(x)-length(x))))+
+  geom_bar()+ 
+  ggtitle("# of People By Domain", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "Domain")+
+  theme_minimal()+ 
+  theme_update(plot.title = element_text(size = rel(2)))+
+  theme(axis.text.x=element_text(angle = -90, hjust = 0, vjust = 0.3))
+
+```
+
+> Here we have the profession of the notable people on the dataset in decreasing
+levels of granularity. We can see their field divided by: occupation, industry 
+and domain.
+
+> The most common occupation in the dataset is that of politician, followed by
+several profession in the entertainment industry, football player, actor and 
+writer. This translates to the distribution of great people by industry and 
+domain, where most of them are located in goverment, the Arts and sports. 
+
+
+> ## Number of Languages
+
+```{r echo=FALSE, message=FALSE, warning=FALSE }
+
+p1 <- ggplot(db, aes(x = article_languages))+
+  geom_histogram( binwidth = 2 )+ 
+  ggtitle("# of People By Article Languages", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "# of Languages")
+
+p2 <- ggplot(db, aes(x = article_languages))+
+  geom_histogram( binwidth = 1 )+ 
+  ggtitle("# of People By Article Languages", 
+          subtitle = "90% of the data") + 
+  labs(y = "# of People", x = "# of Languages") + 
+  xlim(24, quantile(db$article_languages, probs = 0.9))
+
+grid.arrange(p1,p2)
+
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE }
+
+summary(db$article_languages)
+
+```
+
+
+> The number of languages is skewed to the left with more than 75% of the dataset
+being translated to 46 languages or less. There are several outliers, like, the biggest
+value in the dataset, 214, that belongs to the article of Jesus Christ, who is 
+followed by Barack Obama (200 languages) and US actor Corbin Bleu (193)
+
+> ## Total Views & Average Views
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+p1 <- ggplot(db, aes(x = page_views))+
+  geom_histogram( )+ 
+  ggtitle("# of Pageviews per Biography", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "# of page views")
+
+p2 <- ggplot(db, aes(x = page_views))+
+  geom_histogram( )+ 
+  ggtitle("# of Pageviews per Biography", 
+          subtitle = "Log10 of Page Views per Biography") + 
+  labs(y = "# of People", x = "# of page views - Log10") + 
+  scale_x_log10()
+
+grid.arrange(p1, p2)
+
+```
+
+```{r }
+
+summary(db$page_views)
+
+```
+
+
+> Page views are higly skewed to the right, using log10 its possible to see a 
+better representation of the data how it peaks around 1.000.000 views and
+start declining again at 10.000.000. We can see that happening using the median,
+50% of the values are below 1.000.000 and 75% of the values are below 4.000.000.
+
+> Nevertheless page views is filled with outliers, which are people that have 
+changed the course of history or impacted their fields with a breath of fresh 
+ideas. The poeple with most views on Wikipedia, on this dataset are: Michael 
+Jackson, Adolf Hitler and Justin Bieber. An unlikely trio.
+
+> ## Average Views
+
+>Average Views is obtained by dividing the total number of page views by the 
+amount of languages the article is available.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+p1 <- ggplot(db, aes(x = average_views))+
+  geom_histogram( binwidth = 5000 )+ 
+  ggtitle("Average # of Pageviews per Biography", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "Average # of page views") 
+
+p2 <- ggplot(db, aes(x = average_views))+
+  geom_histogram(  )+ 
+  ggtitle("Average # of Pageviews per Biography", 
+          subtitle = "Log10 of Average Page Views per Biography") + 
+  labs(y = "# of People", x = "Average # of page views - Log10") + 
+  scale_x_log10()
+
+grid.arrange(p1, p2)
+
+```
+
+> Average Page Views behaves similar to total page views, is skewed to the right
+and when log10 is applied it normalizes its distribution. Nevertheless it doesnt't
+measure the same as total page views. What average page views tell us is who is 
+consistently more popular across several languages, but it is a mean measurement
+which still means that it is susceptible to large values inflating it. Perhaps
+a median would have been more useful to know the distribution of the page views.
+
+> The biographies with the highest Average Page Views count are Kim Kardashian,
+Lil Wayne and Eminem. 
+
+> ## Historical Popularity Index (HPI)
+
+> The HPI is calculated taking into account several key indicators. Such as the
+time passed since the historical figure lived, number of times their biography
+has been visited,the number of views in different languages and other key factors.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+ggplot(db, aes(x = historical_popularity_index))+
+  geom_histogram(binwidth = 0.5)
+
+```
+
+```{r}
+summary(db$historical_popularity_index)
+
+```
+
+
+> We can see it's distribution resembles a normal one, but it a little skewed to 
+the right. With most values being in the 20 - 24 range. 
+
+# Univariate Analysis
+
+### What is the structure of your dataset?
+
+> There are 11337 notable people in the dataset with 12 features 
+(full_name, birth_year, sex, country, continent, occupation, industry, domain, 
+article_languages, page_views, average_views, historical_popularity_index). 
+There are several factors: continent, sex, industry and domain. But none of
+them are ordered.
+
+> Other notable details of the variables are: \
+- A huge disparity between the quantity of men and woman. \
+- Most notable people come from Europe and worked in goverment institutions. \
+- The most common occupation is politician \
+- The country with the most great people is the United States. \
+- Most people on the dataset have between 628928 and 4485693 views. \
+
+### What is/are the main feature(s) of interest in your dataset?
+
+> The features in the data set I'd like to explore are gender and the
+historical_popularity_index. I'd like to determine the relationship between these
+variables with the rest the dataset. I'd also like to know if there are variables
+that predict "historical relevance" and how good of a predictors are they.
+
+### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
+
+> I think domain, birth year, continent and the amount of languages the biography
+is translated to; might give an insight to the kind of historical figure that 
+becomes popular on Wikipedia. 
+
+### Did you create any new variables from existing variables in the dataset?
+
+> No, I only used existing variables.
+
+### Of the features you investigated, were there any unusual distributions? \
+Did you perform any operations on the data to tidy, adjust, or change the form \
+of the data? If so, why did you do this? 
+
+> Most of the numeric variables are skewed to either the right or the left, most 
+of them have lots of extreme values. In some of the variables, like page_views 
+and average_views, I used log10 to transform the data so its distribution could 
+be more easily seen and it could be more easily managed. 
+
+> I also transformed birth_years from a factor variable to a numeric variable.
+It was what made the most sense in order to visualize and analyze it.
+
+> I also dropped variables such as longitude, latitude. The information they 
+gave is pretty specific and is not something that a variable like continent or
+country wouldn't tell me. I also dropped the state variable due to it's 
+specificity, it only applied to the US.
+
+
+# Bivariate Plots Section
+
+> There are two variables in the data I want to explore, Sex and HPI. During 
+this exploration I will search for relationships between the other variables 
+and those elements. 
+
+> ## Sex:
+
+
+```{r echo=FALSE, Bivariate_Plots}
+
+p1 <- ggplot(db, aes(x = sex, y = page_views)) + 
+  geom_boxplot()+
+  ylim(0, quantile(db$page_views, probs = 0.9)) +
+  ggtitle("Total views", subtitle = "Up to the 0.9 quantile")+ 
+  labs(colour = "Cylinders", x = "Sex", y = "Page Views")
+
+p2 <- ggplot(db, aes(x = sex, y = average_views)) + 
+  geom_boxplot()+
+  ylim(0, quantile(db$average_views, probs = 0.9)) +
+  ggtitle("Avg Views", subtitle = "Up to the 0.9 quantile")+ 
+  labs(colour = "Cylinders", x = "Sex", y = "Average Views")
+
+p4 <- ggplot(db, aes(x = sex, y = article_languages)) + 
+  geom_boxplot()+
+  ggtitle("Languages", subtitle = "Up to the 0.95 quantile")+ 
+  labs(colour = "Cylinders", x = "Sex", y = "Average Views")+
+  ylim(0, quantile(db$article_languages, probs = 0.95)) 
+
+p3 <- ggplot(db, aes(x = sex, y = historical_popularity_index)) + 
+  geom_boxplot()+
+  ggtitle("HPI", subtitle = "Whole dataset")+ 
+  labs(colour = "Cylinders", x = "Sex", y = "HPI")
+
+grid.arrange(p1,p2, p4,p3, ncol = 2, nrow = 2, top = "Sex and ...")
+
+
+```
+
+> Females tend to have more views than males on both, total views and average.
+But, men tend to have more outliers on the upper part of the boxplot. The only
+boxplot with a different behavior is the one for historical popularity, here men
+tend to have higher values than women, but men tend to have more 
+outliers, just that in this case most of the outliers are on the lower part of 
+the boxplot. 
+
+> Both Male and Females have similar distributions 
+of languages in their biographies.
+
+> ### Birth year 
+
+```{r echo=FALSE, message=FALSE}
+ p1 <- ggplot(db, aes(x=birth_year))+
+  geom_histogram(binwidth = 50)+ 
+  scale_x_continuous(breaks = seq(-5000,2000,1000))+
+  ggtitle("Whole Dataset")+ 
+  labs(colour = "Cylinders", x = "Years", y = "# of People")+
+  facet_wrap(~ sex)
+
+ p2 <- ggplot(db, aes(x=birth_year))+
+  geom_histogram(binwidth = 10)+ 
+  scale_x_continuous(breaks = seq(-5000,2000,500))+
+  ggtitle("1000 AC - Today")+ 
+  labs(colour = "Cylinders", x = "Years", y = "# of People")+
+  facet_wrap(~ sex) +
+  xlim(1500,2010)
+
+ grid.arrange(p1, p2, nrow=2, top= " Notable Peope Birth Year per Sex")
+
+```
+
+> We see the same explosion after 1750 in both sexes, but women lag behind for 250
+years before seeing a truly significant growth. More women are known in 
+recent times (1750 & up) than in the rest of human history. Nevertheless men
+have way more records than women, as we had seen in our previous analysis. 
+
+> We also see the same behavior that we observed before on both genders. Both of them rise until recent times where they have a small dip.
+
+> ### Location
+
+```{r fig.height=25, echo=FALSE, message=FALSE }
+
+ggplot(subset(db, continent != ""), 
+       aes(x=reorder(country , country,
+                     function(x)-length(x))))+
+  geom_bar()+ 
+  ggtitle("# of People per Gender per Country", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "Country")+
+  theme_minimal()+ 
+  theme_update(plot.title = element_text(size = rel(2)))+
+  coord_flip()+
+  facet_wrap(~ sex)
+```
+
+```{r echo=FALSE, message=FALSE}
+
+ggplot(subset(db, continent != ""), 
+       aes(x=reorder(continent , continent,
+                     function(x)-length(x))))+
+  geom_bar()+ 
+  ggtitle("# of People per Gender per Continent", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "Continent")+
+  theme_minimal()+ 
+  theme_update(plot.title = element_text(size = rel(2)))+
+  coord_flip()+
+  facet_wrap(~ sex)
+
+```
+
+> Female historical figures were born mostly in the United States and follow a 
+similar distribution to the general view we explored before. In other words, 
+most of them where born in european countries or the US. One relevant difference
+between the two sexes is that most of the figures with **Unknown** nationality 
+are men, not women.
+
+> On the continent scale, Europe is barely holding to the first post in terms of
+women notable figures, North America is quickly catching up to them.
+
+> The rest of the world, Africa, South America and OCeania, have almost no women
+notable figures.
+
+> ### Profession
+
+```{r fig.height=25, echo=FALSE, message=FALSE }
+
+ggplot(subset(db, continent != ""), 
+       aes(x=reorder( occupation , occupation,
+                     function(x)-length(x))))+
+  geom_bar()+ 
+  ggtitle("# of People per Gender per Occupation", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "Occupations")+
+  theme_minimal()+ 
+  theme_update(plot.title = element_text(size = rel(2)))+
+  coord_flip()+
+  facet_wrap(~ sex)
+```
+
+```{r  echo=FALSE, message=FALSE }
+
+ggplot(subset(db, continent != ""), 
+       aes(x=reorder( industry , industry,
+                     function(x)-length(x))))+
+  geom_bar()+ 
+  ggtitle("# of People per Gender per Industry", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "Industry")+
+  theme_minimal()+ 
+  theme_update(plot.title = element_text(size = rel(2)))+
+  coord_flip()+
+  facet_wrap(~ sex)
+
+```
+
+```{r  echo=FALSE, message=FALSE }
+
+ggplot(subset(db, continent != ""), 
+       aes(x=reorder( domain , domain,
+                     function(x)-length(x))))+
+  geom_bar()+ 
+  ggtitle("# of People per Gender per Domain", 
+          subtitle = "Data Obtained from the Pantheon Dataset") + 
+  labs(y = "# of People", x = "Domain")+
+  theme_minimal()+ 
+  theme_update(plot.title = element_text(size = rel(2)))+
+  coord_flip()+
+  facet_wrap(~ sex)
+
+```
+
+> At first glance we can see that among the less populated occupations in the
+dataset the division between genders gave us a clear divide. Some of the 
+occupations in where this divide is evident are: gymnast, pornographic actor, 
+model or companion tend to be roles fulfilled by women, there are few notable 
+men on these roles. Meanwhile men dominate in roles such as historian, inventor,
+explorer or composer. Popular occupation with few notable women. 
+
+> Most notable women work in the Arts, specifically as actresess. Which we can 
+see reflected on the distribution on the industry and domain fields. 
+
+> Here we see a big departure from the distribution we saw on the Domain univariate
+analysis. The distribution of domains for women are remarkably different than the
+one from men or the general one.
+
+> # Conclusions: Gender Exploration
+
+> First, there were some differences 
+in occupations between men and women. Most notable men worked in institutions 
+while women worked in the Arts.
+
+> Also, A big difference comes in terms of popularity,
+women tend to have more pageviews,in total and in average, than men. 
+But men tend to be have a higher HPI than women.
+Both have similar distribution of languages.
+
+> Through this exploration we could see the most common country for notable women
+to come from and which field would a woman most commonly work in. Nevertheless that
+is only the beginning. I would like to know from if there are relationships 
+between views, country and occupation.
+For example: \
+- Is a Male French artist more popular than an American one? 
+How about a Female one? \
+- Which is the most common occupation for notable women per country? How about 
+by continent? And for men? \
+- What kind of occupation receives the most page views on Wikipedia?
+
+
+> # HPI
+
+> ## Page Views & HPI
+
+```{r echo=FALSE, message=FALSE }
+
+ggplot(db, aes(x = hpi, y = page_views)) + 
+  geom_point(alpha = 0.2) +
+  ylim(0, quantile(db$page_views, probs = 0.95)) + 
+  ggtitle("Initial Test Between Page Views & HPI", 
+          subtitle = "Page Views & Historical Popularity Index") + 
+  labs(y = "Page Views", x = "Historical Popularity Index")
+
+
+```
+
+
+```{r echo=FALSE, message=FALSE }
+
+cor.test(db$hpi, db$page_views)
+
+```
+
+> An initial analysis of the relationship between page views and HPI, seems to 
+point to a lack of relationship between the two, The scatterplot and the pearson
+correlation index also guide us in that direction.
+
+> In order to explore the relation of the page view variable with the HPI a bit 
+more. I decided to use log10 to normalize the distribution of page view.
+
+```{r echo=FALSE, message=FALSE }
+
+ggplot(db, aes(x = hpi, y = log10(page_views) )) + 
+  geom_point(alpha = 0.2) +
+  ylim(min(log10(db$page_views)), quantile(log10(db$page_views), probs = 0.95))+ 
+  ggtitle("Log10 Test Between Page Views & HPI", 
+          subtitle = "Log10(Page Views) & Historical Popularity Index") + 
+  labs(y = "Log10(Page Views)", x = "Historical Popularity Index")
+
+
+```
+
+```{r echo=FALSE, message=FALSE }
+
+cor.test(db$hpi, log10(db$page_views) )
+
+
+```
+
+> After applying log10 to the variable we see the changes are minimum, there is 
+no clear relationship between a HPI and page views.
+
+> I double checked by using the pearson correlation index, which is lower than 
+it was before. Which is already pretty close to 0 or "No relation".
+
+> ## Average Views
+
+```{r echo=FALSE, message=FALSE}
+
+ggplot(db, aes(x = hpi, y = average_views)) + 
+  geom_point(alpha = 0.2) +
+  ylim(0, quantile(db$average_views, probs = 0.95)) + 
+  ggtitle("Test Between Avg Page Views & HPI", 
+          subtitle = "Mean Page Views & Historical Popularity Index") + 
+  labs(y = "Mean Page Views", x = "Historical Popularity Index")
+
+```
+```{r echo=FALSE, message=FALSE }
+
+cor.test(db$hpi, db$average_views)
+
+```
+
+> I decided to run a similar process in average views as I ran in page_views.
+On the scatterplot we can se a lack of relationship between the variables. An
+hypothesis that is confirmed by the pearson correlation index, -0.08, which
+indicates a lack of relationship.
+
+> I run the test again with log10, to see if normalizing the distribution of the
+variable helps.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+ggplot(db, aes(x = hpi, y = log10(average_views))) + 
+  geom_point(alpha = 0.2) +
+  ylim(min(log10(db$average_views)), 
+       quantile(log10(db$average_views), probs = 0.95)) + 
+  ggtitle("Log10 Test Between Avg Page Views & HPI", 
+          subtitle = "Log10 Mean Page Views & Historical Popularity Index") + 
+  labs(y = "Log10 Mean Page Views", x = "Historical Popularity Index")
+
+```
+
+```{r echo=FALSE, message=FALSE }
+
+cor.test(db$hpi, log10(db$average_views) )
+```
+
+> Just as with page_views, using log10 makes the pearson coefficient go down.
+
+> Both average and total page views seem to have little relevance in the 
+importance of an historical figure.
+
+> ## Birth Year
+
+```{r echo=FALSE, message=FALSE, warning=FALSE }
+
+ggplot(db, aes(x = hpi, y = antiquity)) + 
+  geom_jitter(alpha = 0.5)+
+  scale_y_continuous( breaks = seq(0, 5500, 500) ) + 
+  ggtitle("Older Notable figures tend to have a higher HPI", 
+          subtitle = "Antiquity in years & Historical Popularity Index") + 
+  labs(y = "Antiquity", x = "Historical Popularity Index")
+
+```
+
+> Using the scatterplot we can see that recent great people then to have the most
+variance in HPI and  older historical figures tend to have higher HPI. On the 
+other side recent notable people are the only ones in the dataset with 
+extremely low HPI values.
+
+```{r echo=FALSE, message=FALSE }
+
+cor.test(db$hpi, log10(db$antiquity))
+
+```
+
+> Using the pearson correlation index we can see that antiquity and HPI are 
+related. It could be one of the potential variables used to predict HPI.
+
+> ## Average Languages
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+ggplot(db, aes(x = hpi, y = article_languages)) + 
+  geom_jitter( alpha = 0.2) +
+  ylim(25, quantile(db$article_languages, probs = 0.95))+ 
+  ggtitle("There is a vague positive relationship", 
+          subtitle = "# of Languages & Historical Popularity Index") + 
+  labs(y = "# of Languages", x = "Historical Popularity Index")
+
+```
+
+> There seems to be a vague positive relationship between HPI and # of Languages.
+The scatterplot is too disperse. I used pearson to check the relationship 
+between the two. 
+
+```{r}
+
+cor.test(db$hpi, db$article_languages)
+
+```
+
+> Languages and HPI have a high correlation index in comparison to page views or
+average views. Nevertheless 0.4 is still too low to consider a relationship 
+between the two.
+
+> ## Profession & Domain
+
+```{r fig.height=30, message= FALSE, echo=FALSE, warning=FALSE }
+
+ggplot(db, aes(x=reorder( occupation , occupation,
+                          function(x)-length(x)),
+               y = hpi))+
+  geom_boxplot()+
+  geom_hline( yintercept= median(db$hpi), linetype="dashed", color = "red") +
+  coord_flip()+ 
+  ggtitle("Which occupations have a higher HPI?", 
+          subtitle = "Occupation & Historical Popularity Index") + 
+  labs(y = "Occupations", x = "Historical Popularity Index")
+  
+
+```
+
+
+> In professions there are winners there losers. In the past graphic we can see 
+are occupations that never rise above the median HPI, the worst case is the one
+of swimmers which fall behind every other profession. On the other side, 
+The profession with the highest median HPI is philosophy.
+
+> Other low performing occupations include: gymnast, skater, skier or tennis 
+player. 
+
+> Other high performing occupations are: pirate, public worker or explorer.
+
+```{r fig.height=15, message= FALSE, echo=FALSE }
+
+ggplot(db, aes(x=reorder( industry , industry,
+                          function(x)-length(x)),
+               y = hpi))+
+  geom_boxplot()+
+  geom_hline( yintercept= median(db$hpi), linetype="dashed", color = "red") +
+  coord_flip()+ 
+  ggtitle("Which Industry has a higher HPI?", 
+          subtitle = "Industry & Historical Popularity Index") + 
+  labs(y = "Industry", x = "Historical Popularity Index")
+
+```
+
+```{r message= FALSE, echo=FALSE }
+
+ggplot(db, aes(x=reorder( domain , domain,
+                          function(x)-length(x)),
+               y = hpi))+
+  geom_boxplot()+
+  geom_hline( yintercept= median(db$hpi), linetype="dashed", color = "red") +
+  coord_flip()+ 
+  ggtitle("Which Domain has a higher HPI?", 
+          subtitle = "Domain & Historical Popularity Index") + 
+  labs(y = "Domain", x = "Historical Popularity Index")
+
+
+```
+
+
+> In the past graphs we can see the picture painted in the occupation boxplots 
+come to life.
+
+> Industries related with sports do poorly on the HPI. Meanwhile, philosophy,
+history and fine arts are the ones with the highes HPI. 
+
+> I have to point out that even though Fine Arts is doing great other fields of 
+the arts are not that lucky: Music, Film & Theater and Media Personality are
+some of the worst performing industries.
+
+> Finally it all comes together on domain, the Humanities (where philosophy is
+located) soar along with Institutions. While the Arts and Sports are the fields
+with the lowest HPI.
+
+> ## Location
+
+```{r fig.height=40, message=FALSE, warning=FALSE, echo=FALSE }
+
+ggplot(db, aes(x=reorder( country , country,
+                          function(x)-length(x)),
+               y = hpi))+
+  geom_boxplot()+
+  geom_hline( yintercept= median(db$hpi), linetype="dashed", color = "red") +
+  coord_flip()+ 
+  ggtitle("Which Country has a higher HPI?", 
+          subtitle = "Country & Historical Popularity Index") + 
+  labs(y = "Country", x = "Historical Popularity Index")
+
+
+```
+
+```{r message=FALSE, warning=FALSE, echo=FALSE }
+
+ggplot(subset(db, continent!=""), aes(x=reorder( continent , continent,
+                          function(x)-length(x)),
+               y = hpi))+
+  geom_boxplot()+
+  geom_hline( yintercept= median(db$hpi), linetype="dashed", color = "red") +
+  coord_flip()+ 
+  ggtitle("Which Continet has a higher HPI?", 
+          subtitle = "Country & Historical Popularity Index") + 
+  labs(y = "Country", x = "Historical Popularity Index")
+```
+
+> Most countries fall under the median HPI line. With the country with the 
+lowest HPI being Swaziland. The countriy with the highest HPI shouldn't come as
+a surprise since their historical colaborations are well know. It is also 
+known as the birthplace of Western Civilization, Greece.
+
+> It also important to point out the behavior of the countries with the most 
+notable people, the US, UK and France. The UK and the US have their respective 
+medians below the global one and have lots of outliers in either side. Meanwhile,
+France behaves similarly to Germany and Italy. They have HPI higher than the global 
+but also a lot of outliers pulling them down. 
+
+> Finally I have to point out that **Unknown** country has one of the highest 
+HPIs.
+
+> In terms of domain we see the past behavior reinforced. Most continents have 
+low HPI levels only Europe, Asia and Unknown have median higher than the global 
+median.
+
+> I would also like to point out that North America has most of its values below
+the mean.
+
+> ## Sex
+
+> We analyzed the relationship between sex and HPI before. Men tend to have
+higher HPI values than women.
+
+```{r }
+
+by(db$hpi, db$sex, summary)
+
+```
+
+
+# Bivariate Analysis
+
+> **Tip**: As before, summarize what you found in your bivariate explorations
+here. Use the questions below to guide your discussion.
+
+### Talk about some of the relationships you observed in this part of the \
+investigation. How did the feature(s) of interest vary with other features in \
+the dataset?
+
+### Did you observe any interesting relationships between the other features \
+(not the main feature(s) of interest)?
+
+### What was the strongest relationship you found?
+
+
+# Multivariate Plots Section
+
+> **Tip**: Now it's time to put everything together. Based on what you found in
+the bivariate plots section, create a few multivariate plots to investigate
+more complex interactions between variables. Make sure that the plots that you
+create here are justified by the plots you explored in the previous section. If
+you plan on creating any mathematical models, this is the section where you
+will do that.
+
+```{r echo=FALSE, Multivariate_Plots}
+
+```
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the \
+investigation. Were there features that strengthened each other in terms of \
+looking at your feature(s) of interest?
+
+### Were there any interesting or surprising interactions between features?
+
+### OPTIONAL: Did you create any models with your dataset? Discuss the \
+strengths and limitations of your model.
+
+------
+
+# Final Plots and Summary
+
+> **Tip**: You've done a lot of exploration and have built up an understanding
+of the structure of and relationships between the variables in your dataset.
+Here, you will select three plots from all of your previous exploration to
+present here as a summary of some of your most interesting findings. Make sure
+that you have refined your selected plots for good titling, axis labels (with
+units), and good aesthetic choices (e.g. color, transparency). After each plot,
+make sure you justify why you chose each plot by describing what it shows.
+
+### Plot One
+```{r echo=FALSE, Plot_One}
+
+```
+
+### Description One
+
+
+### Plot Two
+```{r echo=FALSE, Plot_Two}
+
+```
+
+### Description Two
+
+
+### Plot Three
+```{r echo=FALSE, Plot_Three}
+
+```
+
+### Description Three
+
+------
+
+# Reflection
+
+> **Tip**: Here's the final step! Reflect on the exploration you performed and
+the insights you found. What were some of the struggles that you went through?
+What went well? What was surprising? Make sure you include an insight into
+future work that could be done with the dataset.
+
+> **Tip**: Don't forget to remove this, and the other **Tip** sections before
+saving your final work and knitting the final report!
