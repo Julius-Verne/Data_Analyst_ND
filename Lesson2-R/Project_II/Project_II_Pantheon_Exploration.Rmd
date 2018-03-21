@@ -32,6 +32,7 @@ including all biographies that are present in more than
 
 library(ggplot2)
 library(gridExtra)
+library(GGally)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, Load_the_Data}
@@ -452,7 +453,7 @@ and those elements.
 > ## Sex:
 
 
-```{r echo=FALSE, Bivariate_Plots}
+```{r echo=FALSE, warning=FALSE, Bivariate_Plots}
 
 p1 <- ggplot(db, aes(x = sex, y = page_views)) + 
   geom_boxplot()+
@@ -629,11 +630,23 @@ see reflected on the distribution on the industry and domain fields.
 analysis. The distribution of domains for women are remarkably different than the
 one from men or the general one.
 
-> # Conclusions: Gender Exploration
+> # Bivariate Analysis: Gender Exploration
 
-> First, there were some differences 
+> ## Talk about some of the relationships you observed in this 
+part of the investigation. How did the feature(s) of interest
+vary with other features in the dataset?
+
+> First of all, there were some differences 
 in occupations between men and women. Most notable men worked in institutions 
-while women worked in the Arts.
+while women worked in the Arts, especifically as actresses. The most
+popular profession for men was politician.
+
+> In terms of location, most notable women came from the Unites States.
+With several European countries at it's tail. Looking at the data
+from a continent perspective we see that Europe is the place where
+most notable women are born, followed by the US, Asia and a lack of 
+figures coming from the rest of the world. Men location distribution
+is similar to the general one.
 
 > Also, A big difference comes in terms of popularity,
 women tend to have more pageviews,in total and in average, than men. 
@@ -656,7 +669,7 @@ by continent? And for men? \
 
 > ## Page Views & HPI
 
-```{r echo=FALSE, message=FALSE }
+```{r echo=FALSE, warning=FALSE, message=FALSE }
 
 ggplot(db, aes(x = hpi, y = page_views)) + 
   geom_point(alpha = 0.2) +
@@ -680,9 +693,9 @@ point to a lack of relationship between the two, The scatterplot and the pearson
 correlation index also guide us in that direction.
 
 > In order to explore the relation of the page view variable with the HPI a bit 
-more. I decided to use log10 to normalize the distribution of page view.
+more I decided to use log10 to normalize the distribution of page view.
 
-```{r echo=FALSE, message=FALSE }
+```{r warning=FALSE, echo=FALSE, message=FALSE }
 
 ggplot(db, aes(x = hpi, y = log10(page_views) )) + 
   geom_point(alpha = 0.2) +
@@ -701,15 +714,15 @@ cor.test(db$hpi, log10(db$page_views) )
 
 ```
 
-> After applying log10 to the variable we see the changes are minimum, there is 
+> After applying log10 to the variable we see that there is still 
 no clear relationship between a HPI and page views.
 
-> I double checked by using the pearson correlation index, which is lower than 
-it was before. Which is already pretty close to 0 or "No relation".
+> I double checked using the pearson correlation index, which is lower than 
+it was before, almost 0, meaning "No relation".
 
 > ## Average Views
 
-```{r echo=FALSE, message=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE }
 
 ggplot(db, aes(x = hpi, y = average_views)) + 
   geom_point(alpha = 0.2) +
@@ -718,7 +731,9 @@ ggplot(db, aes(x = hpi, y = average_views)) +
           subtitle = "Mean Page Views & Historical Popularity Index") + 
   labs(y = "Mean Page Views", x = "Historical Popularity Index")
 
+
 ```
+
 ```{r echo=FALSE, message=FALSE }
 
 cor.test(db$hpi, db$average_views)
@@ -757,16 +772,23 @@ importance of an historical figure.
 
 > ## Birth Year
 
+> In order to explore correlation between hpi and birth year I tranformed 
+the birth year variable to avoid negative numbers using the following formula:
+**antiquity = 2013 - birth_year**.
+
+> We substract from 2013 since the dataset was updated last on May 2013.
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE }
 
 ggplot(db, aes(x = hpi, y = antiquity)) + 
   geom_jitter(alpha = 0.5)+
-  scale_y_continuous( breaks = seq(0, 5500, 500) ) + 
+  scale_y_continuous( breaks = seq(-0, 5000, 500) ) + 
   ggtitle("Older Notable figures tend to have a higher HPI", 
           subtitle = "Antiquity in years & Historical Popularity Index") + 
   labs(y = "Antiquity", x = "Historical Popularity Index")
 
 ```
+
 
 > Using the scatterplot we can see that recent great people then to have the most
 variance in HPI and  older historical figures tend to have higher HPI. On the 
@@ -806,7 +828,7 @@ cor.test(db$hpi, db$article_languages)
 ```
 
 > Languages and HPI have a high correlation index in comparison to page views or
-average views. Nevertheless 0.4 is still too low to consider a relationship 
+average views. Nevertheless 0.4 is still too low to consider a strong relationship 
 between the two.
 
 > ## Profession & Domain
@@ -937,29 +959,74 @@ the mean.
 > We analyzed the relationship between sex and HPI before. Men tend to have
 higher HPI values than women.
 
-```{r }
+```{r echo=FALSE, warning=FALSE}
 
 by(db$hpi, db$sex, summary)
 
 ```
 
+> ## General
 
-# Bivariate Analysis
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+set.seed(4685)
+db_subset <- subset(db, select = 
+                      c(antiquity, domain, continent,article_languages,
+                        sex, page_views, average_views, hpi))
 
-> **Tip**: As before, summarize what you found in your bivariate explorations
-here. Use the questions below to guide your discussion.
+names(db_subset)
+ggpairs(db_subset[sample.int(nrow(db_subset), 1000),])
 
-### Talk about some of the relationships you observed in this part of the \
-investigation. How did the feature(s) of interest vary with other features in \
+
+```
+
+
+# Bivariate Analysis: HPI
+
+## Talk about some of the relationships you observed in this part of the \
+investigation. How did the feature(s) of interest vary with other features in
 the dataset?
 
-### Did you observe any interesting relationships between the other features \
+> They main takeaway of the exploration of HPI was the lack of 
+relationship between it and most variables. The exception being,
+Antiquity that has a strong correlation with HPI, and # of Languages.
+
+> In terms of categorical variables of factors. In the next phase of the
+exploration I will only use the less granular format, domain for occupations and
+continent for countries. 
+
+> The Continent variable has a couple of surprises, Unknown is the highest 
+median on the dataset followed by Europe or Asia. Surprisingly the US lacks 
+behind. Continents like South America, Africa and Oceania have the lowest median
+overall.
+
+> In terms of profession we can see that most domain variables have a median that 
+is similar to the global one. With the exception of Sports that is way below and 
+Humanities & Institutions that are above the global median.
+
+> In this categorical variables we saw that the HPI distribution between factors
+is not equal, some have higher or lower HPIs. This proves helpful to our
+modelling ambitions.
+
+
+## Did you observe any interesting relationships between the other features \
 (not the main feature(s) of interest)?
 
-### What was the strongest relationship you found?
+> Yes, average_views and page_views have a high correlation index.
 
+>Also there is a curious relation between views, antiquity and hpi. 
+Just as with HPI, recentnotable figures tend to have more variance
+but as a figure gets older they tendto receive less views.
+Which is the opossite of what happens with HPI, as a 
+figure gets older it becomes more historically relevant.
 
 # Multivariate Plots Section
+
+> ## Sex:
+
+> I come to this part of the analysis with questions already in mind, like:
+- Which profession **domain** recieve more visits depending on gender? \
+- Which continent has more notable women? 
+- Which is the most common 
 
 > **Tip**: Now it's time to put everything together. Based on what you found in
 the bivariate plots section, create a few multivariate plots to investigate
@@ -972,7 +1039,7 @@ will do that.
 
 ```
 
-# Multivariate Analysis
+# Multivariate Analysis: Sex
 
 ### Talk about some of the relationships you observed in this part of the \
 investigation. Were there features that strengthened each other in terms of \
