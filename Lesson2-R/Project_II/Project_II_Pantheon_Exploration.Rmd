@@ -80,7 +80,7 @@ historical impact by using the number of languagues, page views, age of the
 character, and the variation in pageviews per language.
 
 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE }
 summary(db)
 ```
 
@@ -265,6 +265,12 @@ several profession in the entertainment industry, football player, actor and
 writer. This translates to the distribution of great people by industry and 
 domain, where most of them are located in goverment, the Arts and sports. 
 
+> Some small bits that surprised me is the amount of religious figures that are
+well know and remembered. I also though that a career on the entertainment industry
+would be the leading occupation and that entertainment would be the leading domain.
+Since Wikipedia is volunteer run and celebrities tend to be way more popular than
+any politician. Although politician do have an historical advantage, politics as
+an occupation has existed for a long time.
 
 > ## Number of Languages
 
@@ -296,8 +302,10 @@ summary(db$article_languages)
 
 > The number of languages is skewed to the left with more than 75% of the dataset
 being translated to 46 languages or less. There are several outliers, like, the biggest
-value in the dataset, 214, that belongs to the article of Jesus Christ, who is 
-followed by Barack Obama (200 languages) and US actor Corbin Bleu (193)
+value in the dataset, 214 languages, that belongs to the article of Jesus Christ, who is 
+followed by Barack Obama (200 languages) and US actor Corbin Bleu (193).
+
+> We can clearly see a downward exponential trend with languages.
 
 > ## Total Views & Average Views
 
@@ -320,7 +328,7 @@ grid.arrange(p1, p2)
 
 ```
 
-```{r }
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 summary(db$page_views)
 
@@ -368,7 +376,10 @@ which still means that it is susceptible to large values inflating it. Perhaps
 a median would have been more useful to know the distribution of the page views.
 
 > The biographies with the highest Average Page Views count are Kim Kardashian,
-Lil Wayne and Eminem. 
+Lil Wayne and Eminem. Which could either mean that Kim has a large international 
+audience or that few specific countries drive their views up, so that they have
+a high page view number in comparison to the amount of languages their bio is
+translated to.
 
 > ## Historical Popularity Index (HPI)
 
@@ -383,7 +394,7 @@ ggplot(db, aes(x = historical_popularity_index))+
 
 ```
 
-```{r}
+```{r echo=FALSE, message=FALSE, warning= FALSE }
 summary(db$historical_popularity_index)
 
 ```
@@ -495,7 +506,7 @@ of languages in their biographies.
 
 > ### Birth year 
 
-```{r echo=FALSE, message=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE }
  p1 <- ggplot(db, aes(x=birth_year))+
   geom_histogram(binwidth = 50)+ 
   scale_x_continuous(breaks = seq(-5000,2000,1000))+
@@ -539,7 +550,7 @@ ggplot(subset(db, continent != ""),
   facet_wrap(~ sex)
 ```
 
-```{r echo=FALSE, message=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE }
 
 ggplot(subset(db, continent != ""), 
        aes(x=reorder(continent , continent,
@@ -569,7 +580,7 @@ notable figures.
 
 > ### Profession
 
-```{r fig.height=25, echo=FALSE, message=FALSE }
+```{r fig.height=25, echo=FALSE, message=FALSE, warning=FALSE }
 
 ggplot(subset(db, continent != ""), 
        aes(x=reorder( occupation , occupation,
@@ -584,7 +595,7 @@ ggplot(subset(db, continent != ""),
   facet_wrap(~ sex)
 ```
 
-```{r  echo=FALSE, message=FALSE }
+```{r  echo=FALSE, message=FALSE, warning=FALSE }
 
 ggplot(subset(db, continent != ""), 
        aes(x=reorder( industry , industry,
@@ -600,7 +611,7 @@ ggplot(subset(db, continent != ""),
 
 ```
 
-```{r  echo=FALSE, message=FALSE }
+```{r  echo=FALSE, message=FALSE, warning=FALSE }
 
 ggplot(subset(db, continent != ""), 
        aes(x=reorder( domain , domain,
@@ -682,7 +693,7 @@ ggplot(db, aes(x = hpi, y = page_views)) +
 ```
 
 
-```{r echo=FALSE, message=FALSE }
+```{r echo=FALSE, message=FALSE, warning=FALSE }
 
 cor.test(db$hpi, db$page_views)
 
@@ -707,7 +718,7 @@ ggplot(db, aes(x = hpi, y = log10(page_views) )) +
 
 ```
 
-```{r echo=FALSE, message=FALSE }
+```{r echo=FALSE, message=FALSE, warning=FALSE }
 
 cor.test(db$hpi, log10(db$page_views) )
 
@@ -734,7 +745,7 @@ ggplot(db, aes(x = hpi, y = average_views)) +
 
 ```
 
-```{r echo=FALSE, message=FALSE }
+```{r echo=FALSE, message=FALSE, warning= FALSE }
 
 cor.test(db$hpi, db$average_views)
 
@@ -760,7 +771,7 @@ ggplot(db, aes(x = hpi, y = log10(average_views))) +
 
 ```
 
-```{r echo=FALSE, message=FALSE }
+```{r echo=FALSE, message=FALSE, warning= FALSE }
 
 cor.test(db$hpi, log10(db$average_views) )
 ```
@@ -795,7 +806,7 @@ variance in HPI and  older historical figures tend to have higher HPI. On the
 other side recent notable people are the only ones in the dataset with 
 extremely low HPI values.
 
-```{r echo=FALSE, message=FALSE }
+```{r echo=FALSE, message=FALSE, warning= FALSE }
 
 cor.test(db$hpi, log10(db$antiquity))
 
@@ -821,7 +832,7 @@ ggplot(db, aes(x = hpi, y = article_languages)) +
 The scatterplot is too disperse. I used pearson to check the relationship 
 between the two. 
 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE }
 
 cor.test(db$hpi, db$article_languages)
 
@@ -859,7 +870,7 @@ player.
 
 > Other high performing occupations are: pirate, public worker or explorer.
 
-```{r fig.height=15, message= FALSE, echo=FALSE }
+```{r fig.height=15, message= FALSE, echo=FALSE, warning=FALSE }
 
 ggplot(db, aes(x=reorder( industry , industry,
                           function(x)-length(x)),
@@ -873,7 +884,7 @@ ggplot(db, aes(x=reorder( industry , industry,
 
 ```
 
-```{r message= FALSE, echo=FALSE }
+```{r message= FALSE, echo=FALSE, warning=FALSE }
 
 ggplot(db, aes(x=reorder( domain , domain,
                           function(x)-length(x)),
@@ -959,7 +970,7 @@ the mean.
 > We analyzed the relationship between sex and HPI before. Men tend to have
 higher HPI values than women.
 
-```{r echo=FALSE, warning=FALSE}
+```{r echo=FALSE, warning=FALSE, warning=FALSE}
 
 by(db$hpi, db$sex, summary)
 
@@ -1008,13 +1019,13 @@ is not equal, some have higher or lower HPIs. This proves helpful to our
 modelling ambitions.
 
 
-## Did you observe any interesting relationships between the other features \
-(not the main feature(s) of interest)?
+## Did you observe any interesting relationships between \
+the other features (not the main feature(s) of interest)?
 
 > Yes, average_views and page_views have a high correlation index.
 
 >Also there is a curious relation between views, antiquity and hpi. 
-Just as with HPI, recentnotable figures tend to have more variance
+Just as with HPI, recent notable figures tend to have more variance
 but as a figure gets older they tendto receive less views.
 Which is the opossite of what happens with HPI, as a 
 figure gets older it becomes more historically relevant.
@@ -1026,7 +1037,7 @@ figure gets older it becomes more historically relevant.
 > I come to this part of the analysis with questions already in mind, like:
 - Which profession **domain** recieve more visits depending on gender? \
 - Which continent has more notable women? 
-- Which is the most common 
+- Which is the most 
 
 > **Tip**: Now it's time to put everything together. Based on what you found in
 the bivariate plots section, create a few multivariate plots to investigate
@@ -1035,9 +1046,163 @@ create here are justified by the plots you explored in the previous section. If
 you plan on creating any mathematical models, this is the section where you
 will do that.
 
-```{r echo=FALSE, Multivariate_Plots}
+> ## Sex, Occupation and Popularity.
+
+```{r fig.height=12,echo=FALSE,warning=FALSE, message=FALSE }
+
+ggplot(db, aes(x = industry, y = page_views)) + 
+  geom_boxplot()+
+  geom_hline( yintercept= median(db$page_views), linetype="dashed", color = "red") +
+  ylim(0, quantile(db$page_views, probs = 0.9 ))+
+  facet_wrap(~ sex)+
+  coord_flip()
+  
+```
+```{r fig.height=4,echo=FALSE,warning=FALSE, message=FALSE }
+
+ggplot(db, aes(x = domain, y = page_views)) + 
+  geom_boxplot()+
+  geom_hline( yintercept= median(db$page_views), linetype="dashed", color = "red") +
+  ylim(0, quantile(db$page_views, probs = 0.9 ))+
+  facet_wrap(~ sex)+
+  coord_flip()
 
 ```
+
+> As we had seen from our analysis before, Women tend to have more views 
+than men. Now we see where does views concentrate.
+
+> Women receive more significantly more pageviews in the following 
+occupations: Outlaws, Dance or Design. These are fields where women
+are more popular than men in most cases. Nevertheless, Women receive
+more pagevies than their male counterparts in almost every industry but
+men tend to have more outliers after the 75% quantile. Which means,
+women as a group tend to
+be more popular, but the notable people with the most page views
+in an specific industry with the most page views is likely to be male.
+
+> We see a similar behavior on the domain variable. Women tend have more
+page views than men in most domains except in Sports and institutions. But
+We see the same behavior with outliers that we saw before. Although men 
+as a group tend to be less popular than women as a group, men notable 
+figures tend to be more viewed. The exception to this happens on
+the Arts and Exploration domain, where women tend to have more views and there
+are few or no male outliers. 
+
+> ## Sex, Continent and Page Views
+
+```{r fig.height=4,echo=FALSE,warning=FALSE, message=FALSE }
+
+ggplot(subset(db, continent!=""), aes(x = continent, y = page_views)) + 
+  geom_boxplot()+
+  geom_hline( yintercept= median(db$page_views), linetype="dashed", color = "red") +
+  ylim(0, quantile(db$page_views, probs = 0.9 ))+
+  facet_wrap(~ sex)+
+  coord_flip()
+```
+
+> Here we see the same behavior that we saw on the location variables,
+Women tend to be have a higher median and 75% quantile but men have
+more ouliers which end up meaning that the most viewed people on each
+continent are likely men. Only North America and Oceania behave differently,
+they have a higher median and 75% quantile with few or no male outliers.
+
+> ## Sex, Location, Views and Occupation
+
+```{r fig.height=12,echo=FALSE,warning=FALSE, message=FALSE}
+
+ggplot(subset(db, continent!=""), aes(x = continent, y = page_views)) + 
+  geom_boxplot()+
+  geom_hline( yintercept= median(db$page_views), linetype="dashed", color = "red") +
+  ylim(0, quantile(db$page_views, probs = 0.9 ))+
+  facet_grid(domain ~ sex)+
+  coord_flip()
+
+
+```
+
+> Lets start by dissecting each domain by the number of page views they 
+get on each continent.
+
+> ### Arts:
+> The first thing that pops up is the lack of women artist whose birth location
+is unknown. Second of all, notice that Europe has the same behavior observed 
+before women tend to receive more views but men have way more outliers with
+high page view amounts. Other than that we see that in Asia, Africa and North
+America women tend to have more slightly more views. Artist from Oceania and
+South America tend to have more pageviews if they are male.
+
+> In other words the most popular male artists will surely come from Europe and the
+female artist with more pageviews will come from North America.
+
+> ### Business & Law:
+> Women sure got the short straw on this domain. Most continents don't have
+notable business women and the ones that do, North America, Asia and Europe, 
+receive way less page views than their male counterparts in those continents.
+
+> ### Exploration:
+> The behavior is very similar to **Business & Law** with the addition of
+African Explorers.
+
+> ### Humanities:
+Perhaps the most eye catching fact of this section is the high amount of views
+that South American women tend to have. Other than that we see the a similar behavior
+to other fields of knowledge, women tend to have slightly more views, men have
+more outliers with higher values.
+
+> ### Institutions:
+We see the same pattern here, women have more views, men have more outliers.
+Nevertheless I want to point out a couple of details, the great amount of
+views women in institutions get in South America and the huge disparity 
+between men and women in North America.
+
+> ### Public Figures:
+> This one is pretty mixed up. Men are popular in some continents, Women
+in others. There are not that many outliers and no clear structure.
+
+> ### Science & Technology:
+>Most continents have few women scientist but in those who do we see 
+they have slightly more page views in general, the only continent
+that has more views than expected is Africa, where women tend to have 
+way more than their male counterparts. Nevertheless we do see the 
+same behavior with outliers than before.
+
+> ### Sports:
+> This is the male dominated industry. Men have tend to get more 
+page views and have lots of outliers in with really high values. Women
+tend to have less page views than the global median.
+
+> **Conclusion**: The behavior we saw mean women tend to be more popular
+and receive more pageviews in most fields and continents but men tend to 
+have the most viewed notable people in most fields and continents
+with outliers that have thousands of views more than most popular women.
+
+> ## Number of Languages, Sex and Location
+
+```{r echo=FALSE,warning=FALSE, message=FALSE}
+
+ggplot(subset(db, continent!=""), aes(x = continent, y = article_languages)) + 
+  geom_boxplot()+
+  geom_hline( yintercept= median(db$article_languages), linetype="dashed", color = "red") +
+  ylim(0, quantile(db$article_languages, probs = 0.9 ))+
+  facet_wrap(~ sex)+
+  coord_flip()
+
+```
+
+
+```{r echo=FALSE,warning=FALSE, message=FALSE }
+
+ggplot(subset(db, continent!=""), aes(x = domain, y = article_languages)) + 
+  geom_boxplot()+
+  geom_hline( yintercept= median(db$article_languages), linetype="dashed", color = "red") +
+  ylim(0, quantile(db$article_languages, probs = 0.9 ))+
+  facet_wrap(~ sex)+
+  coord_flip()
+```
+
+
+
 
 # Multivariate Analysis: Sex
 
