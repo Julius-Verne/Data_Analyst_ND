@@ -92,3 +92,5 @@ ggplot(aes( x = carat, y = price),
   m5 <- update(m4, ~ . + clarity)
   mtable(m1, m2, m3, m4, m5, sdigits = 3)
   
+  ?mtable
+  
