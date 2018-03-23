@@ -579,7 +579,7 @@ are men, not women.
 > On the continent scale, Europe is barely holding to the first post in terms of
 women notable figures, North America is quickly catching up to them.
 
-> The rest of the world, Africa, South America and OCeania, have almost no women
+> The rest of the world, Africa, South America and Oceania, have almost no women
 notable figures.
 
 > ### Profession
@@ -1043,7 +1043,7 @@ figure gets older it becomes more historically relevant.
 
 > ## Sex:
 
-> I come to this part of the analysis with questions already in mind, like:
+> I come to this part of the analysis with questions already in mind, like: \
 - Which profession **domain** recieve more visits depending on gender? \
 - Which continent has more notable women? 
 
@@ -1418,7 +1418,7 @@ the model.
 
 
 ### Were there any interesting or surprising interactions between features?
-> I created several test visualizations for sex, hpi and other variable like:
+> I created several test visualizations for sex, hpi and other variables like:
 average_language, antiquity or page_views. It is obvious looking at the imbalance
 between the number of men and women but I was surprised by how few women are
 in the dataset.
@@ -1441,13 +1441,13 @@ ggpairs(db_subset[sample.int(nrow(db_subset), 1000),])
 strengths and limitations of your model.
 
 > Through the analysis I found variables I had to include in the model:
-- Birth year has a high correlation with HPI and we know that older figures tend 
+- **Birth year** has a high correlation with HPI and we know that older figures tend 
 to have higher HPI. I would like to include it. \
-- # of Languages, give an idea of how much of a global present does the notable
+- **# of Languages**, give an idea of how much of a global present does the notable
 figure has which is linked to the HPI. \
-- Sex: Men tend to have a higher HPI than women, that fact could help the model 
+- **Sex**: Men tend to have a higher HPI than women, that fact could help the model 
 predict outcomes. \
-- Domain: We have seen that some domains have higher HPI than other. \
+- **Domain**: We have seen that some domains have higher HPI than other. \
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
